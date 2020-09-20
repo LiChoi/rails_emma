@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { NewDrug } from "./NewDrug";
 
 class Library extends React.Component {
     constructor(props){
@@ -7,19 +8,44 @@ class Library extends React.Component {
         this.state = {
             drugs: []
         };
+        this.deleteDrug = this.deleteDrug.bind(this);
+        this.updateLibrary = this.updateLibrary.bind(this);
     }
 
     componentDidMount() {
+        this.updateLibrary()
+    }
+
+    updateLibrary(){
         const url = "/api/v1/drugs/index";
         fetch(url)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error("Network response was not ok.");
-            })
-            .then(response => this.setState({ drugs: response }))
-            .catch(() => this.props.history.push("/"));
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error("Network response was not ok.");
+        })
+        .then(response => this.setState({ drugs: response }))
+        .catch(() => this.props.history.push("/"));
+    }
+
+    deleteDrug(event) {
+        const url = `/api/v1/destroy/${event.target.id}`;
+        const token = document.querySelector('meta[name="csrf-token"]').content;
+    
+        fetch(url, {
+            method: "DELETE",
+            headers: {
+                "X-CSRF-Token": token,
+                "Content-Type": "application/json"
+            }
+        })
+        .then((response) => {
+            if (response.ok) {
+                this.updateLibrary()
+            }
+            //throw new Error("Network response was not ok.");
+        })
     }
 
     render(){
@@ -27,11 +53,15 @@ class Library extends React.Component {
             <div className="vw-100 vh-100 primary-color d-flex align-items-center justify-content-center">
                 <div className="jumbotron jumbotron-fluid bg-transparent">
                     <h1 className="display-4">Drug Library</h1>
+                    <NewDrug updateLibrary={this.updateLibrary} />
                     {
-                        this.state.drugs.map((drug)=>{
+                        this.state.drugs.map((drug, i)=>{
                             return(
-                                <div>
-                                    {`${drug.chemicalName}. Class: ${drug.drug_class}`}
+                                <div key={`Drug${i}`}>
+                                    <p>
+                                        {`${drug.chemicalName}. Class: ${drug.drug_class}`}
+                                    </p>
+                                    <button id={drug.id} onClick={this.deleteDrug}>Delete {drug.chemicalName}</button>
                                 </div>
                             )
                         })

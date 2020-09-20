@@ -6,6 +6,7 @@ class Api::V1::DrugsController < ApplicationController
 
   def create
     drug = Drug.create!(drug_params)
+    puts params
     if drug
       render json: drug
     else
