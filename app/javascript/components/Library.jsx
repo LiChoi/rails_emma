@@ -1,15 +1,18 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { NewDrug } from "./NewDrug";
+import { DrugDetails } from "./DrugDetails";
 
 class Library extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            drugs: []
+            drugs: [],
+            viewDrugID: false
         };
         this.deleteDrug = this.deleteDrug.bind(this);
         this.updateLibrary = this.updateLibrary.bind(this);
+        this.viewDrug = this.viewDrug.bind(this);
     }
 
     componentDidMount() {
@@ -48,6 +51,11 @@ class Library extends React.Component {
         })
     }
 
+    viewDrug(event){
+        console.log("See drug details of drug id: " + event.target.id)
+        this.setState({viewDrugID: event.target.id})
+    }
+
     render(){
         return(
             <div className="vw-100 vh-100 primary-color d-flex align-items-center justify-content-center">
@@ -61,10 +69,20 @@ class Library extends React.Component {
                                     <p>
                                         {`${drug.chemicalName}. Class: ${drug.drug_class}`}
                                     </p>
+                                    <button id={drug.id} onClick={this.viewDrug}>See Details</button>
                                     <button id={drug.id} onClick={this.deleteDrug}>Delete {drug.chemicalName}</button>
                                 </div>
                             )
                         })
+                    }
+                    {
+                        (()=>{
+                            if(this.state.viewDrugID){
+                                return(
+                                    <DrugDetails drug={this.state.viewDrugID} />
+                                )
+                            }
+                        })()
                     }
                     <Link
                         to="/"

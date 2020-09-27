@@ -17,7 +17,7 @@ export class NewDrug extends React.Component {
         const url = "/api/v1/drugs/create";
         const { chemicalName, drug_class } = this.state; // assigns variables to corresponding properties in the object
 
-        if (chemicalName.length == 0 || drug_class.slength == 0)
+        if (chemicalName.length == 0 || drug_class.length == 0)
             return;
 
         const body = {

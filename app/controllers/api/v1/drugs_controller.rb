@@ -6,7 +6,6 @@ class Api::V1::DrugsController < ApplicationController
 
   def create
     drug = Drug.create!(drug_params)
-    puts params
     if drug
       render json: drug
     else
@@ -16,7 +15,12 @@ class Api::V1::DrugsController < ApplicationController
 
   def show
     if drug
-      render json: drug
+      drug_details = drug.as_json
+      puts drug_details 
+      trade_names = TradeName.where(drug_id: params[:id])
+      trade_names = trade_names.map { |trade_name| trade_name.trade_name }
+      drug_details[:trade_names] = trade_names
+      render json: drug_details
     else
       render json: drug.errors
     end
