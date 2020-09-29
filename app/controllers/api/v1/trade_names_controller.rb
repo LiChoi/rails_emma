@@ -15,6 +15,8 @@ class Api::V1::TradeNamesController < ApplicationController
   end
 
   def destroy
+    trade_name = TradeName.find(params[:id])
+    trade_name.destroy
   end
 
   private

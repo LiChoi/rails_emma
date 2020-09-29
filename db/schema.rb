@@ -10,7 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_26_183849) do
+ActiveRecord::Schema.define(version: 2020_09_29_013823) do
+
+  create_table "cross_allergies", force: :cascade do |t|
+    t.text "cross_allergy"
+    t.integer "drug_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["drug_id"], name: "index_cross_allergies_on_drug_id"
+  end
 
   create_table "drugs", force: :cascade do |t|
     t.text "chemicalName"
@@ -27,5 +35,6 @@ ActiveRecord::Schema.define(version: 2020_09_26_183849) do
     t.index ["drug_id"], name: "index_trade_names_on_drug_id"
   end
 
+  add_foreign_key "cross_allergies", "drugs"
   add_foreign_key "trade_names", "drugs"
 end

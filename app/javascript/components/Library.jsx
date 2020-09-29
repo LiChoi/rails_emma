@@ -9,10 +9,7 @@ import { updateDrugList, viewDrug } from "./actions";
 class Library extends React.Component {
     constructor(props){
         super(props);
-        this.state = {
-            drugs: [],
-            viewDrugID: false
-        };
+        this.state = {};
         this.deleteDrug = this.deleteDrug.bind(this);
         this.updateLibrary = this.updateLibrary.bind(this);
         this.viewDrug = this.viewDrug.bind(this);
@@ -67,13 +64,6 @@ class Library extends React.Component {
             <div className="vw-100 vh-100 primary-color d-flex align-items-center justify-content-center">
                 <div className="jumbotron jumbotron-fluid bg-transparent">
                     <h1 className="display-4">Drug Library</h1>
-                    <button onClick={
-                        ()=>{
-                            console.log(this.props.store)
-                            console.log(this.store)
-                            console.log(this.props.drugs)
-                        }
-                    }>View Store</button>
                     <NewDrug updateLibrary={ this.updateLibrary } />
                     {
                         this.props.drugs.map((drug, i)=>{
