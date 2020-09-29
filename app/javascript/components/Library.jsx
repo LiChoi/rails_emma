@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import { NewDrug } from "./NewDrug";
 import { DrugDetails } from "./DrugDetails";
 
+import { connect } from "react-redux"
+import { updateDrugList, viewDrug } from "./actions";
+
 class Library extends React.Component {
     constructor(props){
         super(props);
-        this.state = {
-            drugs: [],
-            viewDrugID: false
-        };
+        this.state = {};
         this.deleteDrug = this.deleteDrug.bind(this);
         this.updateLibrary = this.updateLibrary.bind(this);
         this.viewDrug = this.viewDrug.bind(this);
@@ -28,7 +28,10 @@ class Library extends React.Component {
             }
             throw new Error("Network response was not ok.");
         })
-        .then(response => this.setState({ drugs: response }))
+        //.then(response => this.setState({ drugs: response }))
+        .then((response)=>{
+            this.props.updateDrugList(response)
+        })
         .catch(() => this.props.history.push("/"));
     }
 
@@ -61,15 +64,23 @@ class Library extends React.Component {
             <div className="vw-100 vh-100 primary-color d-flex align-items-center justify-content-center">
                 <div className="jumbotron jumbotron-fluid bg-transparent">
                     <h1 className="display-4">Drug Library</h1>
-                    <NewDrug updateLibrary={this.updateLibrary} />
+                    <NewDrug updateLibrary={ this.updateLibrary } />
                     {
-                        this.state.drugs.map((drug, i)=>{
+                        this.props.drugs.map((drug, i)=>{
                             return(
                                 <div key={`Drug${i}`}>
                                     <p>
                                         {`${drug.chemicalName}. Class: ${drug.drug_class}`}
                                     </p>
-                                    <button id={drug.id} onClick={this.viewDrug}>See Details</button>
+                                    {/*<button id={drug.id} onClick={this.viewDrug}>See Details</button>*/}
+                                    <Link
+                                        to="/drug"
+                                        className="btn btn-lg custom-button"
+                                        role="button"
+                                        onClick={()=>{this.props.viewDrug(drug.id)}} 
+                                    >
+                                        See Details
+                                    </Link>
                                     <button id={drug.id} onClick={this.deleteDrug}>Delete {drug.chemicalName}</button>
                                 </div>
                             )
@@ -98,4 +109,18 @@ class Library extends React.Component {
   
 }
 
-export default Library;
+//export default Library;
+
+const mapStateToProps = (state) => {
+    return {
+        drugs: state.drugs,
+        viewDrugID: state.viewDrugID
+    }
+}
+
+const mapDispatchToProps = {
+    updateDrugList,
+    viewDrug
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Library) 

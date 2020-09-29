@@ -17,9 +17,17 @@ class Api::V1::DrugsController < ApplicationController
     if drug
       drug_details = drug.as_json
       puts drug_details 
+      # Add trade names
       trade_names = TradeName.where(drug_id: params[:id])
-      trade_names = trade_names.map { |trade_name| trade_name.trade_name }
+      #trade_names = trade_names.map { |trade_name| trade_name.trade_name }
       drug_details[:trade_names] = trade_names
+
+      # Add cross allergies
+      cross_allergies = CrossAllergy.where(drug_id: params[:id])
+      cross_allergies = cross_allergies.map { |cross_allergy| cross_allergy.cross_allergy }
+      drug_details[:cross_allergies] = cross_allergies
+
+      # Send it over
       render json: drug_details
     else
       render json: drug.errors
