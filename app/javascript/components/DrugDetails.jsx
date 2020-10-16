@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom"
 import {setDrugDetails} from "./actions"
 import { connect } from "react-redux"
 
@@ -12,6 +13,7 @@ class DrugDetails extends React.Component {
         this.onSubmit = this.onSubmit.bind(this)
         this.onSubmitCrossAllergy = this.onSubmitCrossAllergy.bind(this)
         this.deleteTradeName = this.deleteTradeName.bind(this)
+        this.deleteCrossAllergy = this.deleteCrossAllergy.bind(this)
     }
 
     componentDidMount() {
@@ -125,7 +127,25 @@ class DrugDetails extends React.Component {
             if (response.ok) {
                 this.getDrugDetails()
             }
-            //throw new Error("Network response was not ok.");
+        })
+    }
+
+    deleteCrossAllergy(event){
+        event.preventDefault();
+        const url = "/api/v1/cross_allergies/destroy/" + event.target.id
+        const token = document.querySelector('meta[name="csrf-token"]').content;
+    
+        fetch(url, {
+            method: "DELETE",
+            headers: {
+                "X-CSRF-Token": token,
+                "Content-Type": "application/json"
+            }
+        })
+        .then((response) => {
+            if (response.ok) {
+                this.getDrugDetails()
+            }
         })
     }
 
@@ -135,19 +155,19 @@ class DrugDetails extends React.Component {
                 <h1>Drug Details</h1>
                 <h2>{this.props.drug.chemicalName}</h2>
                 <h3>{this.props.drug.drug_class}</h3>
+                <label htmlFor="tradeNames">Trade Names: </label>
+                {
+                    this.props.drug.trade_names.map((tradeName, i)=>{
+                        return (
+                            <div key={i}>
+                                <p>{tradeName.trade_name}</p>
+                                <button id={tradeName.id} onClick={this.deleteTradeName}>Delete</button>
+                            </div>
+                        )
+                    })
+                }
                 <form id="newTradeName" onSubmit={this.onSubmit}>
                     <div className="form-group">
-                        <label htmlFor="tradeNames">Trade Names: </label>
-                        {
-                            this.props.drug.trade_names.map((tradeName, i)=>{
-                                return (
-                                    <div key={i}>
-                                        <p>{tradeName.trade_name}</p>
-                                        <button id={tradeName.id} onClick={this.deleteTradeName}>Delete</button>
-                                    </div>
-                                )
-                            })
-                        }
                         <input
                             type="text"
                             name="trade_name"
@@ -161,18 +181,19 @@ class DrugDetails extends React.Component {
                         Add Trade Name
                     </button>
                 </form>
+                <label htmlFor="crossAllergies">Cross Allergies: </label>
+                {
+                    this.props.drug.cross_allergies.map((cross_allergy, i)=>{
+                        return (
+                            <div key={i}>
+                                <p>{cross_allergy.cross_allergy}</p>
+                                <button id={cross_allergy.id} onClick={this.deleteCrossAllergy}>Delete</button>
+                            </div>
+                        )
+                    })
+                }
                 <form id="newCrossAllergy" onSubmit={this.onSubmitCrossAllergy}>
                     <div className="form-group">
-                        <label htmlFor="crossAllergies">Cross Allergies: </label>
-                        {
-                            this.props.drug.cross_allergies.map((cross_allergy, i)=>{
-                                return (
-                                    <div key={i}>
-                                        <p>{cross_allergy}</p>
-                                    </div>
-                                )
-                            })
-                        }
                         <input
                             type="text"
                             name="cross_allergy"
@@ -186,6 +207,13 @@ class DrugDetails extends React.Component {
                         Add Cross Allergy
                     </button>
                 </form>
+                <Link
+                    to="/library"
+                    className="btn btn-lg custom-button"
+                    role="button"
+                >
+                    Back to Library
+                </Link>
             </div>
         )
     }

@@ -15,6 +15,8 @@ class Api::V1::CrossAllergiesController < ApplicationController
   end
 
   def destroy
+    cross_allergy = CrossAllergy.find(params[:id])
+    cross_allergy.destroy
   end
 
   private
