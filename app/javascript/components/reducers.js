@@ -7,7 +7,8 @@ export const initialState = {
         chemicalName: "",
         drug_class: "",
         trade_names: [],
-        cross_allergies: []
+        cross_allergies: [],
+        interactions: []
     },
     viewDrugID: false
 }

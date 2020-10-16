@@ -14,6 +14,8 @@ class DrugDetails extends React.Component {
         this.onSubmitCrossAllergy = this.onSubmitCrossAllergy.bind(this)
         this.deleteTradeName = this.deleteTradeName.bind(this)
         this.deleteCrossAllergy = this.deleteCrossAllergy.bind(this)
+        this.onSubmitInteraction = this.onSubmitInteraction.bind(this)
+        this.deleteInteraction = this.deleteInteraction.bind(this)
     }
 
     componentDidMount() {
@@ -149,6 +151,61 @@ class DrugDetails extends React.Component {
         })
     }
 
+    onSubmitInteraction(event) {
+        event.preventDefault();
+        const url = "/api/v1/interactions/create";
+        const { interaction_tag, interaction_tag_type, interaction_severity, interaction_effect } = this.state; // assigns variables to corresponding properties in the object
+
+        if ( interaction_tag.length == 0 || interaction_tag_type.length == 0 || interaction_severity.length == 0 || interaction_effect == 0)
+            return;
+
+        const body = {
+            tag: interaction_tag,
+            tag_type: interaction_tag_type,
+            severity: interaction_severity,
+            effect: interaction_effect,
+            drug_id: this.props.viewDrugID
+        };
+
+        const token = document.querySelector('meta[name="csrf-token"]').content; // Rails adds a token to the doc, which needs to be present in non-get requests 
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "X-CSRF-Token": token,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+        })
+        .then(response => {
+            if (response.ok) {
+                this.getDrugDetails()
+                document.getElementById("interaction_tag").value = ""
+                document.getElementById("interaction_tag_type").value = ""
+                document.getElementById("interaction_severity").value = ""
+                document.getElementById("interaction_effect").value = ""
+            }
+        })
+    }
+
+    deleteInteraction(event){
+        event.preventDefault();
+        const url = "/api/v1/interactions/destroy/" + event.target.id
+        const token = document.querySelector('meta[name="csrf-token"]').content;
+    
+        fetch(url, {
+            method: "DELETE",
+            headers: {
+                "X-CSRF-Token": token,
+                "Content-Type": "application/json"
+            }
+        })
+        .then((response) => {
+            if (response.ok) {
+                this.getDrugDetails()
+            }
+        })
+    }
+
     render(){
         return(
             <div>
@@ -205,6 +262,63 @@ class DrugDetails extends React.Component {
                     </div>
                     <button type="submit" className="btn custom-button mt-3">
                         Add Cross Allergy
+                    </button>
+                </form>
+                <label htmlFor="interactions">Interactions: </label>
+                {
+                    this.props.drug.interactions.map((interaction, i)=>{
+                        return (
+                            <div key={i}>
+                                <p>{interaction.tag_type}: {interaction.tag}</p>
+                                <p>Effect: {interaction.effect}</p>
+                                <p>Severity: {interaction.severity}</p>
+                                <button id={interaction.id} onClick={this.deleteInteraction}>Delete</button>
+                            </div>
+                        )
+                    })
+                }
+                <form id="newInteraction" onSubmit={this.onSubmitInteraction}>
+                    <div>Add new interaction here:</div>
+                    <div className="form-group">
+                        <label>Tag</label>
+                        <input
+                            type="text"
+                            name="interaction_tag"
+                            id="interaction_tag"
+                            className="form-control"
+                            required
+                            onChange={this.onChange}
+                        />
+                        <label>Tag Type</label>
+                        <input
+                            type="text"
+                            name="interaction_tag_type"
+                            id="interaction_tag_type"
+                            className="form-control"
+                            required
+                            onChange={this.onChange}
+                        />
+                        <label>Severity</label>
+                        <input
+                            type="text"
+                            name="interaction_severity"
+                            id="interaction_severity"
+                            className="form-control"
+                            required
+                            onChange={this.onChange}
+                        />
+                        <label>Effect</label>
+                        <input
+                            type="text"
+                            name="interaction_effect"
+                            id="interaction_effect"
+                            className="form-control"
+                            required
+                            onChange={this.onChange}
+                        />
+                    </div>
+                    <button type="submit" className="btn custom-button mt-3">
+                        Add Interaction
                     </button>
                 </form>
                 <Link

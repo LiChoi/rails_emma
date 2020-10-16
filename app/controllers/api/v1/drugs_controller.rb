@@ -25,6 +25,10 @@ class Api::V1::DrugsController < ApplicationController
       cross_allergies = CrossAllergy.where(drug_id: params[:id])
       drug_details[:cross_allergies] = cross_allergies
 
+      # Add interactions
+      interactions = Interaction.where(drug_id: params[:id])
+      drug_details[:interactions] = interactions 
+
       # Send it over
       render json: drug_details
     else
